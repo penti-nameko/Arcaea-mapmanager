@@ -1,3 +1,5 @@
+package com.example.arcaea_mapmanager.data
+
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -5,11 +7,11 @@ import androidx.room.PrimaryKey
 data class SongEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
-    val constant: Double, // 譜面定数
+    val constant: Double,    // 譜面定数
     val bpm: Int,
-    val highScore: Int,
-    val pure: Int,
-    val far: Int,
-    val lost: Int,
-    val status: String // "未クリア", "クリア済み", "詰めている最中"
+    val highScore: Int = 0,
+    val pure: Int = 0,
+    val far: Int = 0,
+    val lost: Int = 0,
+    val status: String = "未クリア" // 未クリア, 詰めている最中, クリア済み
 )
