@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.arcaea_mapmanager"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.arcaea_mapmanager"
@@ -68,6 +68,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // Material Components
+
+    implementation("com.google.android.material:material:1.11.0")
 
     // Room
     implementation(libs.androidx.room.runtime)

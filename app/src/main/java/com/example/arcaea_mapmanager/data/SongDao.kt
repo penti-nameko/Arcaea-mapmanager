@@ -5,12 +5,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SongDao {
-    @Query("SELECT * FROM songs ORDER BY constant DESC")
+    @Query("SELECT * FROM songs ORDER BY title ASC")
     fun getAllSongs(): Flow<List<SongEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSong(song: SongEntity)
+    @Insert
+    suspend fun insert(song: SongEntity)
+
+    @Update
+    suspend fun update(song: SongEntity)
 
     @Delete
-    suspend fun deleteSong(song: SongEntity)
+    suspend fun delete(song: SongEntity)
 }
