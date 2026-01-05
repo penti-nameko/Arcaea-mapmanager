@@ -69,9 +69,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // Material Components
-
-    implementation("com.google.android.material:material:1.11.0")
+    // Material Icons - 追加
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
     // Room
     implementation(libs.androidx.room.runtime)

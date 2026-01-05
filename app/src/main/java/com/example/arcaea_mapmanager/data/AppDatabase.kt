@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [SongEntity::class], version = 1, exportSchema = false)
+@Database(entities = [SongEntity::class], version = 2, exportSchema = false) // versionを2に
 abstract class AppDatabase : RoomDatabase() {
     abstract fun songDao(): SongDao
 
@@ -19,7 +19,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "arcaea_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // 開発中はこれでOK
+                    .build()
                 INSTANCE = instance
                 instance
             }
