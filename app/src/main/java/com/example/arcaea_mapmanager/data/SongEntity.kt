@@ -17,28 +17,29 @@ data class SongEntity(
     val lost: Int = 0,
     val status: ClearStatus = ClearStatus.NOT_CLEARED,
     val grade: Grade = Grade.D,
-    val isInProgress: Boolean = false, // 詰めている最中
-    val memo: String = ""
+    val isInProgress: Boolean = false,
+    val memo: String = "",
+    val dateAdded: Long = System.currentTimeMillis() // 追加日時
 )
 
 enum class ClearStatus {
-    NOT_CLEARED,      // 未クリア
-    TRACK_LOST,       // Track Lost
-    CLEARED,          // クリア済み
-    FULL_RECALL,      // Full Recall
-    PURE_MEMORY,      // Pure Memory
-    EASY_CLEAR,       // Easy Clear (Easyモード)
-    HARD_CLEAR        // Hard Clear (Hardモード)
+    NOT_CLEARED,
+    TRACK_LOST,
+    CLEARED,
+    FULL_RECALL,
+    PURE_MEMORY,
+    EASY_CLEAR,
+    HARD_CLEAR
 }
 
 enum class Grade {
-    EX_PLUS,  // EX+
-    EX,       // EX
-    AA,       // AA
-    A,        // A
-    B,        // B
-    C,        // C
-    D         // D
+    EX_PLUS,
+    EX,
+    AA,
+    A,
+    B,
+    C,
+    D
 }
 
 enum class Difficulty {

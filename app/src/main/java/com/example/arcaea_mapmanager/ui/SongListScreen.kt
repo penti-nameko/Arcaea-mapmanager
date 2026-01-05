@@ -1,5 +1,6 @@
 package com.example.arcaea_mapmanager.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,54 +12,72 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.arcaea_mapmanager.data.SongEntity
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SongListScreen(viewModel: SongViewModel) {
+fun SongListScreen(
+    viewModel: SongViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     val songList by viewModel.allSongs.collectAsState(initial = emptyList())
     var showAddDialog by remember { mutableStateOf(false) }
     var showFilterMenu by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Arcaea 譜面管理") },
-                actions = {
-                    IconButton(onClick = { showFilterMenu = true }) {
-                        Icon(Icons.Default.FilterList, "フィルター")
+    if (showSettings) {
+        SettingsScreen(
+            onBackClick = { showSettings = false },
+            viewModel = viewModel,
+            settingsViewModel = settingsViewModel
+        )
+
+    } else {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Arcaea 譜面管理") },
+                    actions = {
+                        IconButton(onClick = { showFilterMenu = true }) {
+                            Icon(Icons.Default.FilterList, "フィルター")
+                        }
+                        IconButton(onClick = { showSettings = true }) {
+                            Icon(Icons.Default.Settings, "設定")
+                        }
                     }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = { showAddDialog = true }) {
+                    Icon(Icons.Default.Add, "曲を追加")
+                }
+            }
+        ) { padding ->
+            LazyColumn(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+            ) {
+                items(songList) { song ->
+                    SongItem(
+                        song = song,
+                        onEdit = { /* 編集を開く */ },
+                        viewModel = viewModel
+                    )
+                }
+            }
+        }
+
+        if (showAddDialog) {
+            AddSongDialog(
+                onDismiss = { showAddDialog = false },
+                onConfirm = { title, difficulty, constant, bpm ->
+                    viewModel.addSong(title, difficulty, constant, bpm)
+                    showAddDialog = false
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, "曲を追加")
-            }
         }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ) {
-            items(songList) { song ->
-                SongItem(
-                    song = song,
-                    onEdit = { /* 編集ダイアログを開く */ },
-                    viewModel = viewModel
-                )
-            }
-        }
-    }
-
-    if (showAddDialog) {
-        AddSongDialog(
-            onDismiss = { showAddDialog = false },
-            onConfirm = { title, difficulty, constant, bpm ->
-                viewModel.addSong(title, difficulty, constant, bpm)
-                showAddDialog = false
-            }
-        )
     }
 }
 
@@ -70,6 +89,7 @@ fun SongItem(
     viewModel: SongViewModel
 ) {
     var showScoreDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
 
     Card(
@@ -77,7 +97,7 @@ fun SongItem(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
         onClick = { expanded = !expanded }
-    ) {
+    )   {
         Column(modifier = Modifier.padding(16.dp)) {
             // タイトルと難易度
             Row(
@@ -175,30 +195,46 @@ fun SongItem(
                     }
 
                     OutlinedButton(
-                        onClick = { viewModel.toggleInProgress(song) },
+                        onClick = { showEditDialog = true },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(if (song.isInProgress) "詰め解除" else "詰める")
+                        Text("編集")
                     }
                 }
             }
         }
-    }
 
-    if (showScoreDialog) {
-        ScoreUpdateDialog(
-            song = song,
-            onDismiss = { showScoreDialog = false },
-            onConfirm = { score, pure, far, lost, status ->
-                viewModel.updateScore(song, score, pure, far, lost)
-                viewModel.updateStatus(song, status)
-                showScoreDialog = false
-            }
-        )
+        // スコア更新ダイアログ
+        if (showScoreDialog) {
+            ScoreUpdateDialog(
+                song = song,
+                onDismiss = { showScoreDialog = false },
+                onConfirm = { score, pure, far, lost, status ->
+                    viewModel.updateScore(song, score, pure, far, lost)
+                    viewModel.updateStatus(song, status)
+                    showScoreDialog = false
+                }
+            )
+        }
+
+        // 編集ダイアログ
+        if (showEditDialog) {
+            EditSongDialog(
+                song = song,
+                onDismiss = { showEditDialog = false },
+                onConfirm = { title, difficulty, constant, bpm, memo ->
+                    viewModel.updateSong(song, title, difficulty, constant, bpm, memo)
+                    showEditDialog = false
+                },
+                onDelete = {
+                    viewModel.deleteSong(song)
+                    showEditDialog = false
+                }
+            )
+        }
     }
 }
-
-@Composable
+    @Composable
 fun getDifficultyColor(difficulty: String): androidx.compose.ui.graphics.Color {
     return when (difficulty) {
         "PAST" -> androidx.compose.ui.graphics.Color(0xFF4A90E2)
@@ -231,6 +267,7 @@ fun getStatusText(status: com.example.arcaea_mapmanager.data.ClearStatus): Strin
     }
 }
 
+@SuppressLint("DefaultLocale")
 fun formatScore(score: Int): String {
     return String.format("%,d", score)
 }

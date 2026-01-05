@@ -4,10 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [SongEntity::class], version = 2, exportSchema = false) // versionを2に
+@Database(
+    entities = [SongEntity::class, SettingsEntity::class],
+    version = 3,
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun songDao(): SongDao
+    abstract fun settingsDao(): SettingsDao
 
     companion object {
         @Volatile
@@ -20,7 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "arcaea_database"
                 )
-                    .fallbackToDestructiveMigration() // 開発中はこれでOK
+                    .fallbackToDestructiveMigration(false)
                     .build()
                 INSTANCE = instance
                 instance

@@ -71,6 +71,32 @@ class SongViewModel(private val songDao: SongDao) : ViewModel() {
         }
     }
 
+    fun updateSong(
+        song: SongEntity,
+        title: String,
+        difficulty: String,
+        constant: Double,
+        bpm: Int,
+        memo: String
+    ) {
+        viewModelScope.launch {
+            val updatedSong = song.copy(
+                title = title,
+                difficulty = difficulty,
+                constant = constant,
+                bpm = bpm,
+                memo = memo
+            )
+            songDao.update(updatedSong)
+        }
+    }
+
+    fun deleteAllSongs() {
+        viewModelScope.launch {
+            songDao.deleteAll()
+        }
+    }
+
     private fun calculateGrade(score: Int): Grade {
         return when {
             score >= 9900000 -> Grade.EX_PLUS
